@@ -36,7 +36,7 @@ export function LandingHero() {
 
   return (
     <Form {...form}>
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-secondary/20 px-4">
+      <div className="animate-fade-in flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-secondary/20 px-4">
         <div className="flex max-w-5xl flex-col items-center space-y-8 text-center">
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
             Welcome to{" "}
@@ -67,7 +67,7 @@ export function LandingHero() {
                 </FormItem>
               )}
             />
-            <Button type="submit" size="lg" className="w-full sm:w-auto hover:cursor-pointer">
+            <Button type="submit" size="lg" className="animate-scale-up w-full sm:w-auto hover:cursor-pointer">
               Generate Preset
               <SendHorizontal className="ml-2" />
             </Button>

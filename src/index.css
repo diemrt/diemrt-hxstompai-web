@@ -118,3 +118,46 @@
     @apply bg-background text-foreground;
   }
 }
+
+@theme {
+  --animate-fade-in: fade-in 0.5s ease-out;
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+}
+
+@theme {
+  --animate-slide-in-left: slide-in-left 0.4s ease-in-out;
+
+  @keyframes slide-in-left {
+    0% {
+      transform: translateX(-50px); /* Start off-screen */
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0); /* End at its normal position */
+      opacity: 1;
+    }
+  }
+}
+
+@theme {
+  --animate-scale-up: scale-up 0.3s ease-out;
+
+  @keyframes scale-up {
+    0% {
+      transform: scale(0.9); /* Start slightly smaller */
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1); /* End at its normal size */
+      opacity: 1;
+    }
+  }
+}
