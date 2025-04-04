@@ -17,7 +17,7 @@ const ParamKnob = ({ name, value }: ParamKnobProps) => {
     const rotation = getKnobRotation(value);
 
     return (
-        <div className="flex flex-col items-center group">
+        <div className="animate-fade-in flex flex-col items-center group">
             <div className="knob mb-3 relative w-20 h-20 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 shadow-lg border border-zinc-800 transition-all duration-200 hover:scale-105">
                 {/* Outer ring with gradient */}
                 <div className="absolute inset-1 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900" />
