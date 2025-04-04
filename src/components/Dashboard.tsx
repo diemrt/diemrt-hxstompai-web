@@ -76,7 +76,7 @@ export function Dashboard({ aiResponse }: Props) {
             </Card>
 
             <div className="flex gap-4 flex-1">
-                <Card className="flex-[4] animate-slide-in-left min-w-0">
+                <Card className="flex-[2] animate-slide-in-left min-w-0">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Link2 className="h-5 w-5" />
