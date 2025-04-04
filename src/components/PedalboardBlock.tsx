@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { AvailableCategories } from "@/utils";
 import { Activity, ArrowLeftRight, AudioWaveform, BlendIcon, BoomBox, Box, ChartNoAxesColumnDecreasing, Circle, FileAudio, Hourglass, Infinity, KeyboardMusic, Megaphone, RadioReceiver, SlidersVertical, Speaker, Spline, Volume } from "lucide-react";
@@ -91,25 +90,23 @@ const PedalboardBlock = ({
     name,
 }: PedalboardBlockProps) => {
     return (
-        <Card className={`w-52 h-52 flex flex-col justify-between transition-transform duration-300 hover:scale-105 ${getCategoryBgColor(category as AvailableCategories)}`}>
-            <CardHeader className="flex justify-start items-center gap-3">
+        <Card className={`aspect-square w-52 shrink-0 flex flex-col ${getCategoryBgColor(category as AvailableCategories)}`}>
+            <CardHeader className="flex justify-start items-center gap-3 py-3">
                 {getCategoryIcon(category as AvailableCategories)}
                 <CardDescription className="text-xs font-bold">{category}</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-start gap-2">
-                <span className="text-md text-start font-semibold text-primary">
+            <CardContent className="flex flex-col justify-between flex-1 py-3">
+                <span className="text-md font-semibold text-primary">
                     {name}
                 </span>
-                <div>
-                    <div className="flex gap-3">
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Circle className="h-3 w-3" />
-                            <span>Mono</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <BlendIcon className="h-3 w-3" />
-                            <span>Stereo</span>
-                        </div>
+                <div className="flex gap-3">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Circle className="h-3 w-3" />
+                        <span>Mono</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <BlendIcon className="h-3 w-3" />
+                        <span>Stereo</span>
                     </div>
                 </div>
             </CardContent>

@@ -10,29 +10,53 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"; // Assuming you're using the provided UI components
+} from "@/components/ui/form";
 import CarouselPedalboardBlocks from "./CarouselPedalboardBlocks";
+import { useState } from "react";
 
-// Define your form schema
 const formSchema = z.object({
   message: z.string().min(2, {
     message: "Message must be at least 2 characters.",
   }),
 });
 
-export function LandingHero() {
-  // Initialize the form with useForm
+type Props = {
+  onAiResponse: (response: any) => void;
+}
+
+export function LandingHero({ onAiResponse }: Props) {
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      message: "", // Initialize with an empty message
+      message: "",
     },
   });
 
-  const handleSubmit = (values: any) => {
-    // values will be type-safe and validated according to your formSchema
-    console.log("Submitted:", values.message);
-    form.reset(); // Clear the form after submission
+  const handleSubmit = async (values: { message: string }) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("http://localhost:8000/api/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: values.message }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to generate preset");
+      }
+
+      const data = await response.json();
+      onAiResponse(data);
+    } catch (error) {
+      console.error("Error:", error);
+      // You might want to show an error message to the user here
+    } finally {
+      setIsLoading(false);
+      form.reset();
+    }
   };
 
   return (
@@ -62,15 +86,21 @@ export function LandingHero() {
                     <textarea
                       className="min-h-[100px] w-full rounded-lg border bg-background p-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
                       placeholder="e.g., 'warm clean tone with subtle reverb'"
-                      {...field} // Spread the field properties here
+                      disabled={isLoading}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" size="lg" className="animate-scale-up w-full sm:w-auto hover:cursor-pointer">
-              Generate Preset
+            <Button 
+              type="submit" 
+              size="lg" 
+              className="animate-scale-up w-full sm:w-auto hover:cursor-pointer"
+              disabled={isLoading}
+            >
+              {isLoading ? "Generating..." : "Generate Preset"}
               <BrainCircuit className="ml-2" />
             </Button>
           </form>
