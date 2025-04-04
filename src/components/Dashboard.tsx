@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, Link2, SendHorizonal } from "lucide-react";
+import { BrainCircuit, Link2, SendHorizonal, AlertCircle } from "lucide-react";
 import {
     Form,
     FormControl,
@@ -21,8 +21,10 @@ const chatFormSchema = z.object({
     }),
 });
 
+// First, update the AIResponse type to include possible error
 type AIResponse = {
     data: {
+        error?: string;
         pedals: Array<{
             name: string;
             category: string;
@@ -33,13 +35,15 @@ type AIResponse = {
         total_pedals: number;
         remaining_slots: number;
         max_chain_size: number;
-        recipes: string[];
+        recipes?: string[];
     };
 };
 
+// Update the ChatMessage type
 type ChatMessage = {
     type: "bot" | "user";
     message: string;
+    isError?: boolean;
 };
 
 type Props = {
@@ -51,10 +55,8 @@ export function Dashboard({ aiResponse }: Props) {
     const [currentAiResponse, setCurrentAiResponse] = useState<AIResponse>(aiResponse);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // ...existing state...
     const [selectedPedal, setSelectedPedal] = useState<AIResponse["data"]["pedals"][0] | null>(null);
 
-    // Updated PedalboardBlock click handler
     const handlePedalClick = (pedal: AIResponse["data"]["pedals"][0]) => {
         setSelectedPedal(pedal === selectedPedal ? null : pedal);
     };
@@ -71,7 +73,6 @@ export function Dashboard({ aiResponse }: Props) {
     };
 
     useEffect(() => {
-        // Initialize messages with the initial question if it exists
         const initialMessages: ChatMessage[] = [];
         if (aiResponse.initialQuestion) {
             initialMessages.push({
@@ -79,10 +80,10 @@ export function Dashboard({ aiResponse }: Props) {
                 message: aiResponse.initialQuestion
             });
         }
-        initialMessages.push(...aiResponse.data.recipes.map((recipe: string) => ({
+        initialMessages.push(...(aiResponse.data.recipes?.map((recipe: string) => ({
             type: "bot" as const,
             message: recipe
-        })));
+        })) || []));
         setMessages(initialMessages);
     }, []);
 
@@ -90,12 +91,11 @@ export function Dashboard({ aiResponse }: Props) {
         scrollToBottom();
     }, [messages]);
 
+    // Then update the handleSubmit function
     const handleSubmit = async (values: { message: string }) => {
         try {
-            // Add user message to chat
             setMessages(prev => [...prev, { type: "user" as const, message: values.message }]);
 
-            // Make API call
             const response = await fetch("http://localhost:8000/api/ai", {
                 method: "POST",
                 headers: {
@@ -109,23 +109,33 @@ export function Dashboard({ aiResponse }: Props) {
             }
 
             const data = await response.json();
-
-            // Update AI response and add bot messages
             setCurrentAiResponse(data);
-            setMessages(prev => [
-                ...prev,
-                ...data.data.recipes.map((recipe: string) => ({
+
+            // Handle error responses
+            if (data.data.error) {
+                setMessages(prev => [...prev, {
                     type: "bot" as const,
-                    message: recipe
-                }))
-            ]);
+                    message: data.data.error,
+                    isError: true
+                }]);
+            } else {
+                setMessages(prev => [
+                    ...prev,
+                    ...(data.data.recipes?.map((recipe: string) => ({
+                        type: "bot" as const,
+                        message: recipe,
+                        isError: false
+                    })) || [])
+                ]);
+            }
 
             form.reset();
         } catch (error) {
             console.error("Error:", error);
             setMessages(prev => [...prev, {
                 type: "bot" as const,
-                message: "Sorry, I encountered an error processing your request."
+                message: "Sorry, I encountered an error processing your request.",
+                isError: true
             }]);
         }
     };
@@ -151,21 +161,28 @@ export function Dashboard({ aiResponse }: Props) {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="">
-                        <div className="flex gap-4 overflow-x-auto whitespace-nowrap pb-4 px-2 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
-                            {currentAiResponse.data.pedals.map((pedal, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => handlePedalClick(pedal)}
-                                    className="cursor-pointer transition-transform hover:scale-105"
-                                >
-                                    <PedalboardBlock
+                        {currentAiResponse.data.pedals.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
+                                <AlertCircle className="h-12 w-12 mb-2" />
+                                <p>No pedals available in the chain</p>
+                            </div>
+                        ) : (
+                            <div className="flex gap-4 overflow-x-auto whitespace-nowrap pb-4 px-2 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+                                {currentAiResponse.data.pedals.map((pedal, index) => (
+                                    <div
                                         key={index}
-                                        category={pedal.category}
-                                        name={pedal.name}
-                                    />
-                                </div>
-                            ))}
-                        </div>
+                                        onClick={() => handlePedalClick(pedal)}
+                                        className="cursor-pointer"
+                                    >
+                                        <PedalboardBlock
+                                            key={index}
+                                            category={pedal.category}
+                                            name={pedal.name}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
                         {selectedPedal && (
                             <PedalParams
@@ -192,10 +209,13 @@ export function Dashboard({ aiResponse }: Props) {
                                     className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
                                 >
                                     <div
-                                        className={`max-w-[80%] rounded-lg px-4 py-2 ${msg.type === "user"
+                                        className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                                            msg.type === "user"
                                                 ? "bg-primary text-primary-foreground"
+                                                : msg.isError
+                                                ? "bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-200"
                                                 : "bg-muted"
-                                            }`}
+                                        }`}
                                     >
                                         <p className="text-sm">{msg.message}</p>
                                     </div>

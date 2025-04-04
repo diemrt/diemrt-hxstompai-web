@@ -18,7 +18,7 @@ const ParamKnob = ({ name, value }: ParamKnobProps) => {
 
     return (
         <div className="animate-fade-in flex flex-col items-center group">
-            <div className="knob mb-3 relative w-20 h-20 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 shadow-lg border border-zinc-800 transition-all duration-200 hover:scale-105">
+            <div className="knob mb-3 relative w-20 h-20 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 shadow-lg border border-zinc-800">
                 {/* Outer ring with gradient */}
                 <div className="absolute inset-1 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900" />
                 
@@ -26,7 +26,7 @@ const ParamKnob = ({ name, value }: ParamKnobProps) => {
                 <div className="absolute inset-3 rounded-full bg-gradient-to-br from-zinc-800 via-zinc-900 to-zinc-950">
                     {/* Indicator line */}
                     <div 
-                        className="knob-indicator absolute w-0.5 h-7 bg-gradient-to-b from-primary to-primary/70 top-1.5 left-1/2 origin-bottom rounded-full transition-transform duration-200"
+                        className="knob-indicator absolute w-0.5 h-7 bg-gradient-to-b from-primary to-primary/70 top-1.5 left-1/2 origin-bottom rounded-full"
                         style={{ 
                             transform: `rotate(${rotation}deg)`
                         }}
