@@ -49,7 +49,7 @@ export function LandingHero({ onAiResponse }: Props) {
       }
 
       const data = await response.json();
-      onAiResponse(data);
+      onAiResponse({ ...data, initialQuestion: values.message });
     } catch (error) {
       console.error("Error:", error);
       // You might want to show an error message to the user here

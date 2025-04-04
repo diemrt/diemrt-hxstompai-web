@@ -12,6 +12,7 @@ import {
     FormItem,
     FormMessage,
 } from "@/components/ui/form";
+import { useEffect, useRef, useState } from "react";
 
 const chatFormSchema = z.object({
     message: z.string().min(2, {
@@ -41,10 +42,14 @@ type ChatMessage = {
 };
 
 type Props = {
-    aiResponse: AIResponse;
+    aiResponse: AIResponse & { initialQuestion?: string };
 };
 
 export function Dashboard({ aiResponse }: Props) {
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [currentAiResponse, setCurrentAiResponse] = useState<AIResponse>(aiResponse);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
     const form = useForm({
         resolver: zodResolver(chatFormSchema),
         defaultValues: {
@@ -52,16 +57,69 @@ export function Dashboard({ aiResponse }: Props) {
         },
     });
 
-    const handleSubmit = (values: any) => {
-        console.log("Submitted:", values.message);
-        form.reset();
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    // Initial chat messages from AI response
-    const initialMessages: ChatMessage[] = aiResponse.data.recipes.map(recipe => ({
-        type: "bot",
-        message: recipe
-    }));
+    useEffect(() => {
+        // Initialize messages with the initial question if it exists
+        const initialMessages: ChatMessage[] = [];
+        if (aiResponse.initialQuestion) {
+            initialMessages.push({
+                type: "user" as const,
+                message: aiResponse.initialQuestion
+            });
+        }
+        initialMessages.push(...aiResponse.data.recipes.map((recipe: string) => ({
+            type: "bot" as const,
+            message: recipe
+        })));
+        setMessages(initialMessages);
+    }, []);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const handleSubmit = async (values: { message: string }) => {
+        try {
+            // Add user message to chat
+            setMessages(prev => [...prev, { type: "user" as const, message: values.message }]);
+            
+            // Make API call
+            const response = await fetch("http://localhost:8000/api/ai", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ text: values.message }),
+            });
+            
+            if (!response.ok) {
+                throw new Error("Failed to get AI response");
+            }
+
+            const data = await response.json();
+            
+            // Update AI response and add bot messages
+            setCurrentAiResponse(data);
+            setMessages(prev => [
+                ...prev,
+                ...data.data.recipes.map((recipe: string) => ({
+                    type: "bot" as const,
+                    message: recipe
+                }))
+            ]);
+
+            form.reset();
+        } catch (error) {
+            console.error("Error:", error);
+            setMessages(prev => [...prev, { 
+                type: "bot" as const, 
+                message: "Sorry, I encountered an error processing your request." 
+            }]);
+        }
+    };
 
     return (
         <div className="flex flex-col h-screen p-4 gap-4 bg-background">
@@ -80,12 +138,12 @@ export function Dashboard({ aiResponse }: Props) {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Link2 className="h-5 w-5" />
-                            Pedalboard Chain ({aiResponse.data.total_pedals} pedals)
+                            Pedalboard Chain ({currentAiResponse.data.total_pedals} pedals)
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="h-[200px]">
                         <div className="flex gap-4 overflow-x-auto whitespace-nowrap pb-4 px-2 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
-                            {aiResponse.data.pedals.map((pedal, index) => (
+                            {currentAiResponse.data.pedals.map((pedal, index) => (
                                 <PedalboardBlock
                                     key={index}
                                     category={pedal.category}
@@ -105,20 +163,23 @@ export function Dashboard({ aiResponse }: Props) {
                     </CardHeader>
                     <CardContent className="flex-1 flex flex-col">
                         <div className="flex-1 space-y-4 overflow-y-auto mb-4">
-                            {initialMessages.map((msg, index) => (
+                            {messages.map((msg, index) => (
                                 <div
                                     key={index}
                                     className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
                                 >
                                     <div
-                                        className={`max-w-[80%] rounded-lg px-4 py-2 ${msg.type === "user"
-                                            ? "bg-primary text-primary-foreground"
-                                            : "bg-muted"}`}
+                                        className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                                            msg.type === "user"
+                                                ? "bg-primary text-primary-foreground"
+                                                : "bg-muted"
+                                        }`}
                                     >
                                         <p className="text-sm">{msg.message}</p>
                                     </div>
                                 </div>
                             ))}
+                            <div ref={messagesEndRef} />
                         </div>
 
                         <Form {...form}>
