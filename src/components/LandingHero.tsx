@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"; // Assuming you're using the provided UI components
 import PedalboardBlock from "./PedalboardBlock";
+import CarouselPedalboardBlocks from "./CarouselPedalboardBlocks";
 
 // Define your form schema
 const formSchema = z.object({
@@ -73,10 +74,7 @@ export function LandingHero() {
               <SendHorizontal className="ml-2" />
             </Button>
           </form>
-          <PedalboardBlock
-            category="Modulation"
-            name="Ampeg Opto Compressor"
-           />
+          <CarouselPedalboardBlocks />
         </div>
       </div>
     </Form>
