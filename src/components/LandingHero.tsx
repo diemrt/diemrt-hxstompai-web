@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import CarouselPedalboardBlocks from "./CarouselPedalboardBlocks";
+import { PresetSuggestions } from "./PresetSuggestions";
 import { useState } from "react";
 
 const formSchema = z.object({
@@ -78,6 +79,11 @@ export function LandingHero({ onAiResponse }: Props) {
     }
   };
 
+  const handleSuggestionClick = (suggestion: string) => {
+    form.setValue("message", suggestion);
+    form.handleSubmit((values) => handleSubmit(values))();
+  };
+
   return (
     <Form {...form}>
       <div className="relative animate-fade-in flex min-h-screen flex-col items-center justify-center px-4">
@@ -93,6 +99,11 @@ export function LandingHero({ onAiResponse }: Props) {
             Transform your guitar experience with AI-powered tone creation. Simply
             describe your desired sound, and let our AI craft the perfect preset.
           </p>
+
+          <PresetSuggestions 
+            onSuggestionClick={handleSuggestionClick}
+            disabled={isLoading}
+          />
 
           <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full max-w-2xl space-y-4">
             <FormField
