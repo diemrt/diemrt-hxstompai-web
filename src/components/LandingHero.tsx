@@ -74,7 +74,7 @@ export function LandingHero() {
             </Button>
           </form>
           <PedalboardBlock
-            category="Dyamics"
+            category="Modulation"
             name="Ampeg Opto Compressor"
            />
         </div>
