@@ -154,15 +154,15 @@ export function Dashboard({ aiResponse }: Props) {
                     </CardContent>
                 </Card>
 
-                <Card className="flex-1 animate-scale-up flex flex-col">
+                <Card className="flex-1 animate-scale-up flex flex-col h-full">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <BrainCircuit className="h-5 w-5" />
                             AI Assistant
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="flex-1 flex flex-col">
-                        <div className="flex-1 space-y-4 overflow-y-auto mb-4">
+                    <CardContent className="flex flex-col flex-1 relative">
+                        <div className="absolute inset-0 overflow-y-auto space-y-4 px-2 pb-[160px]">
                             {messages.map((msg, index) => (
                                 <div
                                     key={index}
@@ -182,33 +182,35 @@ export function Dashboard({ aiResponse }: Props) {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <Form {...form}>
-                            <form
-                                onSubmit={form.handleSubmit(handleSubmit)}
-                                className="w-full max-w-2xl space-y-4"
-                            >
-                                <FormField
-                                    control={form.control}
-                                    name="message"
-                                    render={({ field }) => (
-                                        <FormItem className="flex-1">
-                                            <FormControl>
-                                                <textarea
-                                                    className="min-h-[100px] w-full rounded-lg border bg-background p-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
-                                                    placeholder="Ask a follow-up question..."
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button type="submit" size="lg" className="animate-scale-up w-full sm:w-auto hover:cursor-pointer">
-                                    Ask AI
-                                    <SendHorizonal className="ml-2" />
-                                </Button>
-                            </form>
-                        </Form>
+                        <div className="absolute bottom-0 left-0 bg-card right-0 p-4">
+                            <Form {...form}>
+                                <form
+                                    onSubmit={form.handleSubmit(handleSubmit)}
+                                    className="w-full space-y-4"
+                                >
+                                    <FormField
+                                        control={form.control}
+                                        name="message"
+                                        render={({ field }) => (
+                                            <FormItem className="flex-1">
+                                                <FormControl>
+                                                    <textarea
+                                                        className="min-h-20 w-full rounded-lg border bg-background p-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
+                                                        placeholder="Ask a follow-up question..."
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Button type="submit" size="lg" className="animate-scale-up w-full sm:w-auto hover:cursor-pointer">
+                                        Ask AI
+                                        <SendHorizonal className="ml-2" />
+                                    </Button>
+                                </form>
+                            </Form>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
