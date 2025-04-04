@@ -13,6 +13,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { useEffect, useRef, useState } from "react";
+import { PedalParams } from "./PedalParams";
 
 const chatFormSchema = z.object({
     message: z.string().min(2, {
@@ -50,6 +51,14 @@ export function Dashboard({ aiResponse }: Props) {
     const [currentAiResponse, setCurrentAiResponse] = useState<AIResponse>(aiResponse);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+    // ...existing state...
+    const [selectedPedal, setSelectedPedal] = useState<AIResponse["data"]["pedals"][0] | null>(null);
+
+    // Updated PedalboardBlock click handler
+    const handlePedalClick = (pedal: AIResponse["data"]["pedals"][0]) => {
+        setSelectedPedal(pedal === selectedPedal ? null : pedal);
+    };
+
     const form = useForm({
         resolver: zodResolver(chatFormSchema),
         defaultValues: {
@@ -85,7 +94,7 @@ export function Dashboard({ aiResponse }: Props) {
         try {
             // Add user message to chat
             setMessages(prev => [...prev, { type: "user" as const, message: values.message }]);
-            
+
             // Make API call
             const response = await fetch("http://localhost:8000/api/ai", {
                 method: "POST",
@@ -94,13 +103,13 @@ export function Dashboard({ aiResponse }: Props) {
                 },
                 body: JSON.stringify({ text: values.message }),
             });
-            
+
             if (!response.ok) {
                 throw new Error("Failed to get AI response");
             }
 
             const data = await response.json();
-            
+
             // Update AI response and add bot messages
             setCurrentAiResponse(data);
             setMessages(prev => [
@@ -114,15 +123,15 @@ export function Dashboard({ aiResponse }: Props) {
             form.reset();
         } catch (error) {
             console.error("Error:", error);
-            setMessages(prev => [...prev, { 
-                type: "bot" as const, 
-                message: "Sorry, I encountered an error processing your request." 
+            setMessages(prev => [...prev, {
+                type: "bot" as const,
+                message: "Sorry, I encountered an error processing your request."
             }]);
         }
     };
 
     return (
-        <div className="flex flex-col h-screen p-4 gap-4 bg-background">
+        <div className="flex flex-col h-screen p-4 gap-4 bg-background mb-4">
             <Card className="w-full animate-fade-in">
                 <CardHeader>
                     <CardTitle className="text-3xl font-bold tracking-tighter">
@@ -141,20 +150,34 @@ export function Dashboard({ aiResponse }: Props) {
                             Pedalboard Chain ({currentAiResponse.data.total_pedals} pedals)
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="h-[200px]">
+                    <CardContent className="">
                         <div className="flex gap-4 overflow-x-auto whitespace-nowrap pb-4 px-2 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
                             {currentAiResponse.data.pedals.map((pedal, index) => (
-                                <PedalboardBlock
+                                <div
                                     key={index}
-                                    category={pedal.category}
-                                    name={pedal.name}
-                                />
+                                    onClick={() => handlePedalClick(pedal)}
+                                    className="cursor-pointer transition-transform hover:scale-105"
+                                >
+                                    <PedalboardBlock
+                                        key={index}
+                                        category={pedal.category}
+                                        name={pedal.name}
+                                    />
+                                </div>
                             ))}
                         </div>
+
+                        {selectedPedal && (
+                            <PedalParams
+                                name={selectedPedal.name}
+                                category={selectedPedal.category}
+                                params={selectedPedal.params}
+                            />
+                        )}
                     </CardContent>
                 </Card>
 
-                <Card className="flex-1 animate-scale-up flex flex-col h-full">
+                <Card className="flex-1 animate-scale-up flex flex-col h-full ">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <BrainCircuit className="h-5 w-5" />
@@ -169,11 +192,10 @@ export function Dashboard({ aiResponse }: Props) {
                                     className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
                                 >
                                     <div
-                                        className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                                            msg.type === "user"
+                                        className={`max-w-[80%] rounded-lg px-4 py-2 ${msg.type === "user"
                                                 ? "bg-primary text-primary-foreground"
                                                 : "bg-muted"
-                                        }`}
+                                            }`}
                                     >
                                         <p className="text-sm">{msg.message}</p>
                                     </div>
