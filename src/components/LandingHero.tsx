@@ -45,14 +45,33 @@ export function LandingHero({ onAiResponse }: Props) {
       });
       
       if (!response.ok) {
-        throw new Error("Failed to generate preset");
+        onAiResponse({
+          data: {
+            error: "Failed to generate preset",
+            pedals: [],
+            total_pedals: 0,
+            remaining_slots: 0,
+            max_chain_size: 0
+          },
+          initialQuestion: values.message
+        });
+        return;
       }
 
       const data = await response.json();
       onAiResponse({ ...data, initialQuestion: values.message });
     } catch (error) {
       console.error("Error:", error);
-      // You might want to show an error message to the user here
+      onAiResponse({
+        data: {
+          error: "An unexpected error occurred",
+          pedals: [],
+          total_pedals: 0,
+          remaining_slots: 0,
+          max_chain_size: 0
+        },
+        initialQuestion: values.message
+      });
     } finally {
       setIsLoading(false);
       form.reset();

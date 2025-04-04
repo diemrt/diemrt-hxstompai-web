@@ -80,10 +80,18 @@ export function Dashboard({ aiResponse }: Props) {
                 message: aiResponse.initialQuestion
             });
         }
-        initialMessages.push(...(aiResponse.data.recipes?.map((recipe: string) => ({
-            type: "bot" as const,
-            message: recipe
-        })) || []));
+        if (aiResponse.data.error) {
+            initialMessages.push({
+                type: "bot" as const,
+                message: aiResponse.data.error,
+                isError: true
+            });
+        } else {
+            initialMessages.push(...(aiResponse.data.recipes?.map((recipe: string) => ({
+                type: "bot" as const,
+                message: recipe
+            })) || []));
+        }
         setMessages(initialMessages);
     }, []);
 
