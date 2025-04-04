@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { SendHorizontal } from "lucide-react";
+import { BrainCircuit } from "lucide-react";
 import {
   Form,
   FormField,
@@ -11,7 +11,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"; // Assuming you're using the provided UI components
-import PedalboardBlock from "./PedalboardBlock";
 import CarouselPedalboardBlocks from "./CarouselPedalboardBlocks";
 
 // Define your form schema
@@ -38,8 +37,9 @@ export function LandingHero() {
 
   return (
     <Form {...form}>
-      <div className="animate-fade-in flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-secondary/20 px-4">
-        <div className="flex max-w-5xl flex-col items-center space-y-8 text-center">
+      <div className="relative animate-fade-in flex min-h-screen flex-col items-center justify-center px-4">
+        <CarouselPedalboardBlocks />
+        <div className="flex max-w-5xl flex-col items-center space-y-8 text-center z-10">
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
             Welcome to{" "}
             <span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
@@ -71,10 +71,9 @@ export function LandingHero() {
             />
             <Button type="submit" size="lg" className="animate-scale-up w-full sm:w-auto hover:cursor-pointer">
               Generate Preset
-              <SendHorizontal className="ml-2" />
+              <BrainCircuit className="ml-2" />
             </Button>
           </form>
-          <CarouselPedalboardBlocks />
         </div>
       </div>
     </Form>

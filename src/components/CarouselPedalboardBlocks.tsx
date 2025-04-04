@@ -42,22 +42,20 @@ const CarouselPedalboardBlocks = () => {
     }, [shuffledItems]);
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return null;
     }
     if (!data) {
-        return <div>No data available</div>;
+        return null;
     }
 
     return (
-        <div className="flex flex-col items-center justify-center">
-            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
-                Pedalboard Blocks
-            </h1>
-            <div className="relative w-full overflow-hidden mt-8">
+        <div className="fixed opacity-30 bottom-0 left-0 right-0 h-[300px] -z-10 overflow-hidden pointer-events-none">
+            <div className="absolute w-full h-full bg-gradient-to-b from-background via-background/95 to-transparent" />
+            <div className="relative w-full h-full">
                 <div 
-                    className="flex gap-4 transition-transform duration-1000"
+                    className="flex gap-8 transition-transform duration-[2000ms] ease-in-out absolute bottom-0 pb-8"
                     style={{
-                        transform: `translateX(-${position * (200 + 16)}px)`, // 200px for card width + 16px for gap
+                        transform: `translateX(-${position * (300 + 32)}px)`,
                     }}
                 >
                     {shuffledItems.map((block: any, index: number) => (
