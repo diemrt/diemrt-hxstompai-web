@@ -1,7 +1,7 @@
-import { LandingHero } from "@/components/LandingHero"
+import { Dashboard } from "@/components/Dashboard"
 
 const Index = () => {
-  return <LandingHero />
+  return <Dashboard />
 }
 
 export default Index
