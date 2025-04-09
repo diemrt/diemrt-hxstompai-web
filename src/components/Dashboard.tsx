@@ -109,7 +109,7 @@ export function Dashboard({ aiResponse }: Props) {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ text: values.message }),
+                body: JSON.stringify({ text: values.message, reset_context: true }),
             });
 
             if (!response.ok) {

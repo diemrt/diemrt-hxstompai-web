@@ -8,8 +8,8 @@ type PresetSuggestionsProps = {
 
 const suggestions = [
     "Create Blues tone with tube screamer and spring reverb",
-    "Create an ambient clean tone with shimmer reverb",
-    "Generate something with EQ pedals and Amps"
+    "Create an ambient clean tone with shimmer reverb to play post-rock",
+    "Generate a Worship Tone for Contemporary Christian Music solo guitar",
 ];
 
 export function PresetSuggestions({ onSuggestionClick, disabled }: PresetSuggestionsProps) {
